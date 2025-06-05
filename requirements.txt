@@ -1,0 +1,15 @@
+diffusers==0.32.1
+transformers==4.47.1
+opencv-python
+safetensors
+pillow==10.2.0
+einops
+peft
+imageio
+omegaconf
+ultralytics
+tqdm==4.67.1
+protobuf==3.20
+torch==2.3.0
+torchvision==0.18.0
+moviepy==1.0.3

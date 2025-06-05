@@ -1,0 +1,14 @@
+n_prompt: "bad quality, worse quality"
+vdm_prompt: "a man walking in the factory"
+relight_prompt: "a man walking in the factory, sunlight through the factory"
+video_path: "input_cog/man.mp4"
+save_path: "output_cog"
+
+width: 512
+height: 512
+num_frames: 49
+strength: 0.4
+gamma: 0.7
+num_step: 25
+text_guide_scale: 2
+seed: 42

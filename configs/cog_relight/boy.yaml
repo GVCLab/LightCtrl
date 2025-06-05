@@ -1,0 +1,14 @@
+n_prompt: "bad quality, worse quality"
+vdm_prompt: "a cute boy is smiling"
+relight_prompt: "a cute boy is smiling, cozy candlelight"
+video_path: "input_cog/boy_cog.mp4"
+save_path: "output_cog"
+
+width: 720
+height: 480
+num_frames: 49
+strength: 0.4
+gamma: 0.7
+num_step: 25
+text_guide_scale: 2
+seed: 42
