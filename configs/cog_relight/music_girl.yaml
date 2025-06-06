@@ -2,6 +2,8 @@ n_prompt: "bad quality, worse quality"
 vdm_prompt: "a girl listening a music"
 relight_prompt: "a girl listening a music, natural lighting, warm atmosphere"
 video_path: "input_cog/music_girl_cog.mp4"
+light_radius: 75
+bg_source: "CIRCULAR"
 save_path: "output_cog"
 
 width: 720
