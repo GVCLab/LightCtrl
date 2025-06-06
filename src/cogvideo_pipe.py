@@ -727,7 +727,6 @@ class CogVideoXVideoToVideoPipeline(DiffusionPipeline, CogVideoXLoraLoaderMixin)
 
 
             normal_video_list, normal_video_name = read_normal_video(video_path, width, height)
-            print("delight latents are saved")
             print("normal_video_name: ",normal_video_name)
 
             normal_video = self.video_processor.preprocess_video(normal_video_list, height=height, width=width)#video.shape: torch.Size([1, 3, 16, 512, 512])
