@@ -84,20 +84,33 @@ conda activate LightCtrl
 pip install -r requirements.txt
 ```
 ### 2. Download the pretrained model
-IC-Light:[🤗Huggingface](https://huggingface.co/lllyasviel/ic-light) ;SD RealisticVision: [🤗Huggingface](https://huggingface.co/stablediffusionapi/realistic-vision-v51) ;Animatediff Motion-Adapter-V-1.5.3: [🤗Huggingface](https://huggingface.co/guoyww/animatediff-motion-adapter-v1-5-3)
+IC-Light:[🤗Huggingface](https://huggingface.co/lllyasviel/ic-light) ;
 
+SD RealisticVision: [🤗Huggingface](https://huggingface.co/stablediffusionapi/realistic-vision-v51) ;
 
-### 3. Light map generation according to light trajectory
+Animatediff Motion-Adapter-V-1.5.3: [🤗Huggingface](https://huggingface.co/guoyww/animatediff-motion-adapter-v1-5-3)
 
-### 4. Relighting
+### 3. 💡Relighting
 
-Video relighting with user-defined light trajectory
+Video relighting with user-defined light setting
 ```python
 python relight.py --config "configs/animatediff_relight/music_girl.yaml"
 ```
 
+LightCtrl also supports CogVideoX backbone
+
+```python
+python cog_relight.py --config "configs/cog_relight/blackman.yaml"
+```
+
 ## Citation
+
 If you find our work helpful, please leave us a star and cite our paper.
 ```
 
 ```
+
+## Acknowledgements
+
+We are very grateful to the authors of [Light-A-Video](https://github.com/bcmi/Light-A-Video), [AnimateDiff](https://github.com/guoyww/AnimateDiff), [CogVideoX](https://github.com/THUDM/CogVideo), and [IC-Light](https://github.com/lllyasviel/IC-Light) for the foundation of our code from their open-source code.
+
