@@ -88,7 +88,9 @@ IC-Light:[🤗Huggingface](https://huggingface.co/lllyasviel/ic-light) ;
 
 SD RealisticVision: [🤗Huggingface](https://huggingface.co/stablediffusionapi/realistic-vision-v51) ;
 
-Animatediff Motion-Adapter-V-1.5.3: [🤗Huggingface](https://huggingface.co/guoyww/animatediff-motion-adapter-v1-5-3)
+Animatediff Motion-Adapter-V-1.5.3: [🤗Huggingface](https://huggingface.co/guoyww/animatediff-motion-adapter-v1-5-3) ;
+
+CogVideoX-2b: [🤗Huggingface](https://huggingface.co/THUDM/CogVideoX-2b)
 
 ### 3. 💡Relighting
 
