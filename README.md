@@ -5,9 +5,9 @@
 
 **[Arxiv]| [PDF]**
 
-## Video demos
+## Demo Video
 
-[![视频封面文字](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID)
+[![视频封面文字](fig/demo_video.png)](https://youtu.be/CQfTe9jAGD8)
 
 ```
 [![视频封面文字](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID)
