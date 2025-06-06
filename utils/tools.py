@@ -405,3 +405,4 @@ def box_low_pass_filter(shape, d_s=0.25, d_t=0.25):
     mask[..., cframe - threshold_t:cframe + threshold_t, crow - threshold_s:crow + threshold_s, ccol - threshold_s:ccol + threshold_s] = 1.0
 
     return mask
+

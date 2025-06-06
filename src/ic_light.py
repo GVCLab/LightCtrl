@@ -25,10 +25,6 @@ class BGSource(Enum):
     CIRCULAR = "CIRCULAR Light"
     SMI_CIRCULAR = "smi CIRCULAR Light"
     RADIUS_CHANGE = "R_CHANGE Light"
-    TOP_RIGHT_BOTTOM_LEFT_CYCLE = "top_right_bottom_left_cycle"
-    LEFT_TOP_RIGHT_BOTTOM_CYCLE = "left_top_right_bottom_cycle"
-    BOTTOM_LEFT_TOP_RIGHT_CYCLE = "bottom_left_top_right_cycle"
-    RIGHT_BOTTOM_LEFT_TOP_CYCLE = "right_bottom_left_top_cycle"
 
 
 
@@ -38,6 +34,8 @@ class Relighter:
     def __init__(self, 
                  delight_target,
                  lbd,
+                 bg_source,
+                 light_radius,
                  pipeline, 
                  relight_prompt="",
                  num_frames=16,
@@ -76,83 +74,83 @@ class Relighter:
         
         conds, unconds = self.encode_prompt_pair(tokenizer, device, positive_prompt, negative_prompt)
 
-        #diverse Light map
+        ################################ Pre-defined Light Trajectory #############################################
         if not is_code_run:
-             # 生成 TOP_LEFT_TO_BOTTOM_RIGHT 的 16 帧序列
+             
             frames_top_left_to_bottom_right = []
             for i in range(16):
-                input_bg = self.create_dynamic_background(BGSource.TOP_LEFT_TO_BOTTOM_RIGHT, frame_index=i, total_frames=16)
+                input_bg = self.create_dynamic_background(BGSource.TOP_LEFT_TO_BOTTOM_RIGHT, R=light_radius, frame_index=i, total_frames=16)
                 filename = os.path.join("output/top_left_to_bottom_right_bg", f"{i}.png")
                 cv2.imwrite(filename, input_bg)
-                bg = resize_and_center_crop(input_bg, self.image_width, self.image_height)  # 调整背景大小
-                bg_latent = numpy2pytorch([bg], device, vae.dtype)  # 转换为 PyTorch 张量
-                bg_latent = vae.encode(bg_latent).latent_dist.mode() * vae.config.scaling_factor  # 编码为 latent
+                bg = resize_and_center_crop(input_bg, self.image_width, self.image_height)  
+                bg_latent = numpy2pytorch([bg], device, vae.dtype)  
+                bg_latent = vae.encode(bg_latent).latent_dist.mode() * vae.config.scaling_factor  
                 frames_top_left_to_bottom_right.append(bg_latent)
 
-            # 生成 BOTTOM_LEFT_TO_TOP_RIGHT 的 16 帧序列
+            
             frames_bottom_left_to_top_right = []
             for i in range(16):
-                input_bg = self.create_dynamic_background(BGSource.BOTTOM_LEFT_TO_TOP_RIGHT, frame_index=i, total_frames=16)
+                input_bg = self.create_dynamic_background(BGSource.BOTTOM_LEFT_TO_TOP_RIGHT, R=light_radius, frame_index=i, total_frames=16)
                 filename = os.path.join("output/bottom_left_to_top_right_bg", f"{i}.png")
                 cv2.imwrite(filename, input_bg)
-                bg = resize_and_center_crop(input_bg, self.image_width, self.image_height)  # 调整背景大小
-                bg_latent = numpy2pytorch([bg], device, vae.dtype)  # 转换为 PyTorch 张量
-                bg_latent = vae.encode(bg_latent).latent_dist.mode() * vae.config.scaling_factor  # 编码为 latent
+                bg = resize_and_center_crop(input_bg, self.image_width, self.image_height)  
+                bg_latent = numpy2pytorch([bg], device, vae.dtype)  
+                bg_latent = vae.encode(bg_latent).latent_dist.mode() * vae.config.scaling_factor  
                 frames_bottom_left_to_top_right.append(bg_latent)
 
-            # 生成 circular 的 16 帧序列
+           
             frames_circular = []
             for i in range(16):
-                input_bg = self.create_dynamic_background(BGSource.CIRCULAR, frame_index=i, total_frames=16)
+                input_bg = self.create_dynamic_background(BGSource.CIRCULAR, R=light_radius, frame_index=i, total_frames=16)
                 filename = os.path.join("output/circular_bg", f"{i}.png")
                 cv2.imwrite(filename, input_bg)
-                bg = resize_and_center_crop(input_bg, self.image_width, self.image_height)  # 调整背景大小
-                bg_latent = numpy2pytorch([bg], device, vae.dtype)  # 转换为 PyTorch 张量
-                bg_latent = vae.encode(bg_latent).latent_dist.mode() * vae.config.scaling_factor  # 编码为 latent
+                bg = resize_and_center_crop(input_bg, self.image_width, self.image_height)  
+                bg_latent = numpy2pytorch([bg], device, vae.dtype)  
+                bg_latent = vae.encode(bg_latent).latent_dist.mode() * vae.config.scaling_factor  
                 frames_circular.append(bg_latent)
 
-            # 生成 circular 的 16 帧序列
+           
             frames_smi_circular = []
             for i in range(16):
-                input_bg = self.create_dynamic_background(BGSource.SMI_CIRCULAR, frame_index=i, total_frames=16)
+                input_bg = self.create_dynamic_background(BGSource.SMI_CIRCULAR, R=light_radius, frame_index=i, total_frames=16)
                 filename = os.path.join("output/smi_circular_bg", f"{i}.png")
                 cv2.imwrite(filename, input_bg)
-                bg = resize_and_center_crop(input_bg, self.image_width, self.image_height)  # 调整背景大小
-                bg_latent = numpy2pytorch([bg], device, vae.dtype)  # 转换为 PyTorch 张量
-                bg_latent = vae.encode(bg_latent).latent_dist.mode() * vae.config.scaling_factor  # 编码为 latent
+                bg = resize_and_center_crop(input_bg, self.image_width, self.image_height)  
+                bg_latent = numpy2pytorch([bg], device, vae.dtype)  
+                bg_latent = vae.encode(bg_latent).latent_dist.mode() * vae.config.scaling_factor  
                 frames_smi_circular.append(bg_latent)
 
-            # 生成 TOP-TO-BOTTOM 的 16 帧序列
+            
             frames_top_to_bottom = []
             for i in range(16):
-                input_bg = self.create_dynamic_background(BGSource.TOP_TO_BOTTOM, frame_index=i, total_frames=16)
+                input_bg = self.create_dynamic_background(BGSource.TOP_TO_BOTTOM, R=light_radius, frame_index=i, total_frames=16)
                 filename = os.path.join("output/top_to_bottom_bg", f"{i}.png")
                 cv2.imwrite(filename, input_bg)
-                bg = resize_and_center_crop(input_bg, self.image_width, self.image_height)  # 调整背景大小
-                bg_latent = numpy2pytorch([bg], device, vae.dtype)  # 转换为 PyTorch 张量
-                bg_latent = vae.encode(bg_latent).latent_dist.mode() * vae.config.scaling_factor  # 编码为 latent
+                bg = resize_and_center_crop(input_bg, self.image_width, self.image_height)  
+                bg_latent = numpy2pytorch([bg], device, vae.dtype)  
+                bg_latent = vae.encode(bg_latent).latent_dist.mode() * vae.config.scaling_factor  
                 frames_top_to_bottom.append(bg_latent)
 
-            # 生成 LEFT-TO-RIGHT 的 16 帧序列
+            
             frames_left_to_right = []
             for i in range(16):
-                input_bg = self.create_dynamic_background(BGSource.LEFT_TO_RIGHT, frame_index=i, total_frames=16)
+                input_bg = self.create_dynamic_background(BGSource.LEFT_TO_RIGHT,R=light_radius,  frame_index=i, total_frames=16)
                 filename = os.path.join("output/left_to_right_bg", f"{i}.png")
                 cv2.imwrite(filename, input_bg)
-                bg = resize_and_center_crop(input_bg, self.image_width, self.image_height)  # 调整背景大小
-                bg_latent = numpy2pytorch([bg], device, vae.dtype)  # 转换为 PyTorch 张量
-                bg_latent = vae.encode(bg_latent).latent_dist.mode() * vae.config.scaling_factor  # 编码为 latent
+                bg = resize_and_center_crop(input_bg, self.image_width, self.image_height)  
+                bg_latent = numpy2pytorch([bg], device, vae.dtype)  
+                bg_latent = vae.encode(bg_latent).latent_dist.mode() * vae.config.scaling_factor 
                 frames_left_to_right.append(bg_latent)
 
-            # 生成 LEFT-TO-RIGHT 的 16 帧序列
+            
             frames_radius_change = []
             for i in range(16):
-                input_bg = self.create_dynamic_background(BGSource.RADIUS_CHANGE, frame_index=i, total_frames=16)
+                input_bg = self.create_dynamic_background(BGSource.RADIUS_CHANGE,R=light_radius,  frame_index=i, total_frames=16)
                 filename = os.path.join("output/radius_change_bg", f"{i}.png")
                 cv2.imwrite(filename, input_bg)
-                bg = resize_and_center_crop(input_bg, self.image_width, self.image_height)  # 调整背景大小
-                bg_latent = numpy2pytorch([bg], device, vae.dtype)  # 转换为 PyTorch 张量
-                bg_latent = vae.encode(bg_latent).latent_dist.mode() * vae.config.scaling_factor  # 编码为 latent
+                bg = resize_and_center_crop(input_bg, self.image_width, self.image_height)  
+                bg_latent = numpy2pytorch([bg], device, vae.dtype)  
+                bg_latent = vae.encode(bg_latent).latent_dist.mode() * vae.config.scaling_factor  
                 frames_radius_change.append(bg_latent)
 
             
@@ -163,16 +161,30 @@ class Relighter:
     
 
 
-        #choice your light map trajectory
-        self.bg_latent=frames_circular
-        # self.bg_latent=frames_top_left_to_bottom_right
-        # self.bg_latent=frames_bottom_left_to_top_right
-        # self.bg_latent=frames_smi_circular
-        # self.bg_latent=frames_left_to_right
-        # self.bg_latent=frames_radius_change
-        # self.bg_latent=frames_top_to_bottom
+        ###########################Set your light map in IC-Light ########################
+        def set_bg_latent(bg_source):
+            if bg_source == BGSource.CIRCULAR:
+                self.bg_latent = frames_circular
+            elif bg_source == BGSource.TOP_LEFT_TO_BOTTOM_RIGHT:
+                self.bg_latent = frames_top_left_to_bottom_right
+            elif bg_source == BGSource.BOTTOM_LEFT_TO_TOP_RIGHT:
+                self.bg_latent = frames_bottom_left_to_top_right
+            elif bg_source == BGSource.TOP_TO_BOTTOM:
+                self.bg_latent = frames_top_to_bottom
+            elif bg_source == BGSource.LEFT_TO_RIGHT:
+                self.bg_latent = frames_left_to_right
+            elif bg_source == BGSource.SMI_CIRCULAR:
+                self.bg_latent = frames_smi_circular
+            elif bg_source == BGSource.RADIUS_CHANGE:
+                self.bg_latent = frames_radius_change
+            else:
+                raise ValueError(f"Unsupported bg_source: {bg_source}")
+            
 
-        self.bg_latent = torch.cat(self.bg_latent, dim=0)  # 形状为 [16, C, H, W]
+        set_bg_latent(bg_source)
+
+
+        self.bg_latent = torch.cat(self.bg_latent, dim=0)  #[16, C, H, W]
 
         self.conds = conds.repeat(self.num_frames, 1, 1)
         self.unconds = unconds.repeat(self.num_frames, 1, 1)
@@ -213,96 +225,91 @@ class Relighter:
 
     
 
-    def create_dynamic_background(self, bg_source, frame_index, total_frames=16):
-
+    def create_dynamic_background(self, bg_source, R, frame_index, total_frames=16):
         max_pix = 255
         min_pix = 0
 
-        # 计算当前帧的进度 (0 到 1)
         t = frame_index / (total_frames - 1)
 
-        # 创建网格
         x = np.arange(self.image_width)
         y = np.arange(self.image_height)
         xx, yy = np.meshgrid(x, y)
 
         if bg_source == BGSource.TOP_LEFT_TO_BOTTOM_RIGHT:
-            # 光源从左上移动到右下
+            # Light source moves from top-left to bottom-right
             light_x = int(t * (self.image_width - 1))
             light_y = int(t * (self.image_height - 1))
         elif bg_source == BGSource.BOTTOM_LEFT_TO_TOP_RIGHT:
-            # 光源从左下移动到右上
+            # Light source moves from bottom-left to top-right
             light_x = int(t * (self.image_width - 1))
             light_y = int((1 - t) * (self.image_height - 1))
         elif bg_source == BGSource.TOP_TO_BOTTOM:
-            # 光源从上到下
-            light_x = self.image_width // 4  # 光源始终在中间的列
+            # Light source moves from top to bottom
+            light_x = self.image_width // 4  # Light source stays in the middle column
             light_y = int(t * (self.image_height - 1))
         elif bg_source == BGSource.LEFT_TO_RIGHT:
-            # 光源从左到右
+            # Light source moves from left to right
             light_x = int(t * (self.image_width - 1))
-            light_y = self.image_height // 4  # 光源始终在中间的行
+            light_y = self.image_height // 4  # Light source stays in the middle row
         elif bg_source == BGSource.CIRCULAR:
-            # 环形移动的光源
+            # Circular moving light source
             center_x = self.image_width // 2
             center_y = self.image_height // 2
             radius = min(self.image_width, self.image_height) // 2
 
-            # 计算光源的当前位置（沿着圆形路径移动）
+            # Calculate the current position of the light source (moving along a circular path)
             angle = 2 * np.pi * t
             light_x = int(center_x + radius * np.cos(angle))
             light_y = int(center_y + radius * np.sin(angle))
         elif bg_source == BGSource.SMI_CIRCULAR:
-            # 环形移动的光源
+            # Circular moving light source
             center_x = self.image_width // 2
             center_y = self.image_height // 2
             radius = min(self.image_width, self.image_height) // 2
 
-            # 计算光源的当前位置（沿着圆形路径移动）
+            # Calculate the current position of the light source (moving along a circular path)
             angle = 1 * np.pi * t
             light_x = int(center_x - radius * np.cos(angle))
             light_y = int(center_y + radius * np.sin(-angle))
         elif bg_source == BGSource.RADIUS_CHANGE:
-            # 光源半径随时间变化
-            center_x = self.image_width // 4 # 光源固定在中心
+            # Light source radius changes over time
+            center_x = self.image_width // 4  # Light source fixed at the center
             center_y = self.image_height // 4
 
-            # 初始半径和变化范围
-            base_radius = 20  # 初始半径
-            delta_radius = 200  # 半径变化范围
-            light_radius = base_radius + int(delta_radius * t)  # 半径随时间变化
+            # Initial radius and change range
+            base_radius = 20  # Initial radius
+            delta_radius = 200  # Radius change range
+            light_radius = base_radius + int(delta_radius * t)  # Radius changes over time
 
-            # 计算每个像素到光源中心的距离
+            # Calculate the distance from each pixel to the light source center
             distance = np.sqrt((xx - center_x) ** 2 + (yy - center_y) ** 2)
 
-            # 使用高斯分布模拟光源亮度衰减，sigma 随半径变化
-            sigma = light_radius  # 控制亮度衰减的范围
+            # Use Gaussian distribution to simulate light intensity attenuation, with sigma changing with radius
+            sigma = light_radius  # Controls the range of light intensity attenuation
             gradient = max_pix * np.exp(-(distance ** 2) / (2 * sigma ** 2))
 
-            # 将亮度限制在 [min_pix, max_pix] 范围内
+            # Limit the brightness to the range [min_pix, max_pix]
             gradient = np.clip(gradient, min_pix, max_pix)
-            # 将单通道图像扩展为 RGB 图像
+            # Expand the single-channel image to an RGB image
             image = np.stack((gradient,) * 3, axis=-1).astype(np.uint8)
             return image
         else:
             raise ValueError("Invalid bg_source! Please use a valid BGSource enum value.")
 
-        # 计算每个像素到光源的距离
+        # Calculate the distance from each pixel to the light source
         distance = np.sqrt((xx - light_x) ** 2 + (yy - light_y) ** 2)
 
-        # 光源辐射半径
-        light_radius = 75 
+        # Light source radiation radius
+        light_radius = R
 
-
-        sigma = light_radius  # 控制亮度衰减的范围
+        sigma = light_radius  # Controls the range of light intensity attenuation
         gradient = max_pix * np.exp(-(distance ** 2) / (2 * sigma ** 2))
 
-        # 将亮度限制在 [min_pix, max_pix] 范围内
+        # Limit the brightness to the range [min_pix, max_pix]
         gradient = np.clip(gradient, min_pix, max_pix)
-        # 将单通道图像扩展为 RGB 图像
+        # Expand the single-channel image to an RGB image
         image = np.stack((gradient,) * 3, axis=-1).astype(np.uint8)
         return image
-
     
     @torch.no_grad()
     def __call__(self, input_video, delight_target, lbd,init_latent=None, input_strength=None):

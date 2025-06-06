@@ -1,6 +1,8 @@
 n_prompt: "bad quality, worse quality"
 relight_prompt: "a house on the grass,  moonlight glow at festival."
 video_path: "input_animatediff/house.mp4"
+light_radius: 75
+bg_source: "RADIUS_CHANGE"
 save_path:  "output"
 
 width: 512

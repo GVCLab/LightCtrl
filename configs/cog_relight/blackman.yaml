@@ -1,7 +1,10 @@
 n_prompt: "bad quality, worse quality"
 vdm_prompt: "a man is standing in front of a window"
 relight_prompt: "a man is standing in front of a window, warm sunlight through the window"
-video_path: "input_cog/blackman_cog.mp4"
+video_path: "input_cog/blackman.mp4"
+light_radius: 150
+bg_source: "SMI_CIRCULAR"
+
 save_path: "output_cog"
 
 width: 720

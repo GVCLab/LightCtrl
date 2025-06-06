@@ -1,6 +1,8 @@
 n_prompt: "bad quality, worse quality"
 relight_prompt: "a cute boy,   cozy candlelight."
 video_path: "input_animatediff/boy.mp4"
+light_radius: 75
+bg_source: "LEFT_TO_RIGHT"
 save_path:  "output"
 
 width: 512

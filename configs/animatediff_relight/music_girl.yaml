@@ -1,6 +1,8 @@
 n_prompt: "bad quality, worse quality"
 relight_prompt: "a girl listening a music, natural lighting, warm atmosphere"
 video_path: "input_animatediff/music_girl.mp4"
+light_radius: 150
+bg_source: "CIRCULAR"
 save_path:  "output"
 
 width: 512

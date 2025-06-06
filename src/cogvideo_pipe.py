@@ -20,6 +20,7 @@ import os
 import torch
 from PIL import Image
 from transformers import T5EncoderModel, T5Tokenizer
+import numpy as np
 
 from diffusers.callbacks import MultiPipelineCallbacks, PipelineCallback
 from diffusers.loaders import CogVideoXLoraLoaderMixin
@@ -39,6 +40,7 @@ from src.cogvideo_ic_light import Relighter
 from einops import rearrange
 from diffusers.utils import export_to_gif
 import math
+from src.cogvideo_ic_light import BGSource
 
 from utils.tools import read_normal_video
 
@@ -568,6 +570,8 @@ class CogVideoXVideoToVideoPipeline(DiffusionPipeline, CogVideoXLoraLoaderMixin)
         relight_prompt=None,
         video: List[Image.Image] = None,
         video_path=None,
+        bg_source= BGSource.BOTTOM_LEFT_TO_TOP_RIGHT,
+        light_radius: int = 75,
         prompt: Optional[Union[str, List[str]]] = None,
         negative_prompt: Optional[Union[str, List[str]]] = None,
         height: int = 480,
@@ -751,34 +755,8 @@ class CogVideoXVideoToVideoPipeline(DiffusionPipeline, CogVideoXLoraLoaderMixin)
 
 
         num_frames = video.shape[2]
-
+        ################################### Light Map Injection ####################################    
         x_T_total= rearrange(latents, "1 c f h w -> 1 1 c f h w")
-
-        light_radius=75
-        
-
-        from enum import Enum
-        # latents=rearrange(x_T_total, "1 1 c f h w -> 1 c f h w")
-        class BGSource(Enum):
-            NONE = "None"
-            LEFT = "Left Light"
-            RIGHT = "Right Light"
-            TOP = "Top Light"
-            BOTTOM = "Bottom Light"
-            TOP_LEFT_TO_BOTTOM_RIGHT = "TOP_LEFT_TO_BOTTOM_RIGHT Light"
-            BOTTOM_LEFT_TO_TOP_RIGHT = "BOTTOM_LEFT_TO_TOP_RIGHT Light"
-            TOP_TO_BOTTOM = "TOP_TO_BOTTOM Light"
-            LEFT_TO_RIGHT = "LEFT_TO_RIGHT Light"
-            CIRCULAR = "CIRCULAR Light"
-            SMI_CIRCULAR = "smi CIRCULAR Light"
-            RADIUS_CHANGE = "R_CHANGE Light"
-            TOP_RIGHT_BOTTOM_LEFT_CYCLE = "top_right_bottom_left_cycle"
-            LEFT_TOP_RIGHT_BOTTOM_CYCLE = "left_top_right_bottom_cycle"
-            BOTTOM_LEFT_TOP_RIGHT_CYCLE = "bottom_left_top_right_cycle"
-            RIGHT_BOTTOM_LEFT_TOP_CYCLE = "right_bottom_left_top_cycle"
-
-
-        import numpy as np
 
         def inject_light_map_noise(x_T_total, bg_source,R, device, total_frames):
  
@@ -787,7 +765,7 @@ class CogVideoXVideoToVideoPipeline(DiffusionPipeline, CogVideoXLoraLoaderMixin)
             min_pix = 0
             light_radius = R/8   #resize to size in latent space（Light_radius/8）
             sigma = light_radius
-            threshold = 0.2 #光照mask阈值
+            threshold = 0.2 
 
             
             for i in range(total_frames):
@@ -848,50 +826,7 @@ class CogVideoXVideoToVideoPipeline(DiffusionPipeline, CogVideoXLoraLoaderMixin)
                     light_radius = base_radius + int(delta_radius * t)  # 半径随时间变化
 
                     sigma = light_radius 
-                if bg_source == BGSource.TOP_RIGHT_BOTTOM_LEFT_CYCLE:
-                # 上右下左循环
-                    light_positions = [
-                        (image_width // 2, 0),          # 上
-                        (image_width - 1, image_height // 2), # 右
-                        (image_width // 2, image_height - 1), # 下
-                        (0, image_height // 2)          # 左
-                    ]
-                        # 根据总帧数和当前帧索引计算当前光源位置索引
-                    position_idx = (i // (total_frames // 4)) % 4
-                    light_x, light_y = light_positions[position_idx]
-                elif bg_source == BGSource.LEFT_TOP_RIGHT_BOTTOM_CYCLE:
-                    # 左上右下循环
-                    light_positions = [
-                        (0, image_height // 2),          # 左
-                        (image_width // 2, 0),          # 上
-                        (image_width - 1, image_height // 2), # 右
-                        (image_width // 2, image_height - 1)  # 下
-                    ]
-                        # 根据总帧数和当前帧索引计算当前光源位置索引
-                    position_idx = (i // (total_frames // 4)) % 4
-                    light_x, light_y = light_positions[position_idx]
-                elif bg_source == BGSource.BOTTOM_LEFT_TOP_RIGHT_CYCLE:
-                    # 下左上右循环
-                    light_positions = [
-                        (image_width // 2, image_height - 1), # 下
-                        (0, image_height // 2),          # 左
-                        (image_width // 2, 0),          # 上
-                        (image_width - 1, image_height // 2)  # 右
-                    ]
-                        # 根据总帧数和当前帧索引计算当前光源位置索引
-                    position_idx = (i // (total_frames // 4)) % 4
-                    light_x, light_y = light_positions[position_idx]
-                elif bg_source == BGSource.RIGHT_BOTTOM_LEFT_TOP_CYCLE:
-                    # 右下左上循环
-                    light_positions = [
-                        (image_width - 1, image_height // 2), # 右
-                        (image_width // 2, image_height - 1), # 下
-                        (0, image_height // 2),          # 左
-                        (image_width // 2, 0)           # 上
-                    ]
-                    # 根据总帧数和当前帧索引计算当前光源位置索引
-                    position_idx = (i // (total_frames // 4)) % 4
-                    light_x, light_y = light_positions[position_idx]
+                
 
                 # 计算每个像素到光源的距离
                 distance = np.sqrt((xx - light_x) ** 2 + (yy - light_y) ** 2)
@@ -951,7 +886,7 @@ class CogVideoXVideoToVideoPipeline(DiffusionPipeline, CogVideoXLoraLoaderMixin)
             
             return x_T_total
         
-        latents = inject_light_map_noise(x_T_total=x_T_total,bg_source=BGSource.CIRCULAR,R=light_radius,device=device, total_frames=num_frames)
+        latents = inject_light_map_noise(x_T_total=x_T_total,bg_source=bg_source,R=light_radius,device=device, total_frames=num_frames)
         latents=rearrange(latents, "1 1 c f h w -> 1 c f h w")
 
 
@@ -964,6 +899,8 @@ class CogVideoXVideoToVideoPipeline(DiffusionPipeline, CogVideoXLoraLoaderMixin)
             relight_prompt=relight_prompt,
             generator=generator, 
             num_frames=num_frames,
+            bg_source=bg_source,
+            light_radius=light_radius,
             image_width=width,
             image_height=height,
             delight_target=normal_target,

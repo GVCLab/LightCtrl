@@ -4,7 +4,7 @@ import inspect
 from typing import Any, Callable, Dict, List, Optional, Union
 import imageio
 from moviepy.editor import ImageSequenceClip
-from utils.utils_freetraj import get_freq_filter
+
 import torch
 from transformers import CLIPImageProcessor, CLIPTextModel, CLIPTokenizer, CLIPVisionModelWithProjection
 
@@ -22,8 +22,8 @@ from diffusers.schedulers import (
     PNDMScheduler,
     DDIMInverseScheduler,
 )
-from models.StableDiffusion3D.unet import UNet3DConditionModel
-from models.scheduling_ddim import DDIMScheduler  # add reverse step
+# from models.StableDiffusion3D.unet import UNet3DConditionModel
+# from models.scheduling_ddim import DDIMScheduler  # add reverse step
 from diffusers.utils import USE_PEFT_BACKEND, logging, scale_lora_layers, unscale_lora_layers
 from diffusers.utils.torch_utils import randn_tensor
 from diffusers.video_processor import VideoProcessor
@@ -45,7 +45,12 @@ from utils.tools import read_normal_video
 from enum import Enum
 import numpy as np
 
+from src.ic_light import BGSource
+
+
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
+
+
 
 EXAMPLE_DOC_STRING = """
     Examples:
@@ -747,6 +752,8 @@ class AnimateDiffVideoToVideoPipeline(
         video: List[List[PipelineImageInput]] = None,
         video_path=None,
         fg_video: torch=None,
+        bg_source= BGSource.BOTTOM_LEFT_TO_TOP_RIGHT,
+        light_radius: int = 75,
         prompt: Optional[Union[str, List[str]]] = None,
         height: Optional[int] = None,
         width: Optional[int] = None,
@@ -963,28 +970,8 @@ class AnimateDiffVideoToVideoPipeline(
         )
 
 
-        # Light Map Injection
+        ################################### Light Map Injection ####################################
         x_T_total= rearrange(latents, "1 c f h w -> 1 1 c f h w")
-        light_radius=75
-        
-        from enum import Enum
-        class BGSource(Enum):
-            NONE = "None"
-            LEFT = "Left Light"
-            RIGHT = "Right Light"
-            TOP = "Top Light"
-            BOTTOM = "Bottom Light"
-            TOP_LEFT_TO_BOTTOM_RIGHT = "TOP_LEFT_TO_BOTTOM_RIGHT Light"
-            BOTTOM_LEFT_TO_TOP_RIGHT = "BOTTOM_LEFT_TO_TOP_RIGHT Light"
-            TOP_TO_BOTTOM = "TOP_TO_BOTTOM Light"
-            LEFT_TO_RIGHT = "LEFT_TO_RIGHT Light"
-            CIRCULAR = "CIRCULAR Light"
-            SMI_CIRCULAR = "smi CIRCULAR Light"
-            RADIUS_CHANGE = "R_CHANGE Light"
-            TOP_RIGHT_BOTTOM_LEFT_CYCLE = "top_right_bottom_left_cycle"
-            LEFT_TOP_RIGHT_BOTTOM_CYCLE = "left_top_right_bottom_cycle"
-            BOTTOM_LEFT_TOP_RIGHT_CYCLE = "bottom_left_top_right_cycle"
-            RIGHT_BOTTOM_LEFT_TOP_CYCLE = "right_bottom_left_top_cycle"
 
         def inject_light_map_noise(x_T_total, bg_source,R, device, total_frames):
 
@@ -993,114 +980,96 @@ class AnimateDiffVideoToVideoPipeline(
                     min_pix = 0
                     light_radius = R/8   #resize to size in latent space（Light_radius/8）
                     sigma = light_radius
-                    threshold = 0.2 #光照mask阈值
+                    threshold = 0.2 #mask threshold
+
 
                     for i in range(total_frames):
-                        # 计算当前帧的进度 (0 到 1)
                         t = i / (total_frames - 1)
                         
-                        # 创建网格
                         x = np.arange(image_width)
                         y = np.arange(image_height)
                         xx, yy = np.meshgrid(x, y)
                         
                         if bg_source == BGSource.TOP_LEFT_TO_BOTTOM_RIGHT:
-                            # 光源从左上移动到右下
                             light_x = int(t * (image_width - 1))
                             light_y = int(t * (image_height - 1))
                         elif bg_source == BGSource.BOTTOM_LEFT_TO_TOP_RIGHT:
-                            # 光源从左下移动到右上
                             light_x = int(t * (image_width - 1))
                             light_y = int((1 - t) * (image_height - 1))
                         elif bg_source == BGSource.TOP_TO_BOTTOM:
-                            # 光源从上到下
-                            light_x = image_width // 4  # 光源始终在中间的列
+                            light_x = image_width // 4 
                             light_y = int(t * (image_height - 1))
                         elif bg_source == BGSource.LEFT_TO_RIGHT:
-                            # 光源从左到右
                             light_x = int(t * (image_width - 1))
-                            light_y = image_height // 4  # 光源始终在中间的行
+                            light_y = image_height // 4  
                         elif bg_source == BGSource.CIRCULAR:
-                            # 环形移动的光源
                             center_x = image_width // 2
                             center_y = image_height // 2
                             radius = min(image_width, image_height) // 2
 
-                            # 计算光源的当前位置（沿着圆形路径移动）
                             angle = 2 * np.pi * t
                             light_x = int(center_x + radius * np.cos(angle))
                             light_y = int(center_y + radius * np.sin(angle))
 
                         elif bg_source == BGSource.SMI_CIRCULAR:
-                            # 环形移动的光源
                             center_x = image_width // 2
                             center_y = image_height // 2
                             radius = min(image_width, image_height) // 2
 
-                            # 计算光源的当前位置（沿着圆形路径移动）
                             angle = 1 * np.pi * t
                             light_x = int(center_x - radius * np.cos(angle))
                             light_y = int(center_y + radius * np.sin(-angle))
 
                         elif bg_source == BGSource.RADIUS_CHANGE:
-                            # 光源半径随时间变化
-                            light_x = image_width // 1 # 光源固定在中心
+                            light_x = image_width // 1 
                             light_y = image_height // 4
 
-                            # 初始半径和变化范围
-                            base_radius = 2.5#5#2.5  # 初始半径
-                            delta_radius = 25#25#12.5  # 半径变化范围
-                            light_radius = base_radius + int(delta_radius * t)  # 半径随时间变化
+                            base_radius = 2.5#5#2.5  
+                            delta_radius = 25#25#12.5 
+                            light_radius = base_radius + int(delta_radius * t)  
 
                             sigma = light_radius 
+                        else:
+                            print(f"Warning: Unknown bg_source value: {bg_source}")
+                            continue 
                         
 
                         
-                        # 计算每个像素到光源的距离
-                        distance = np.sqrt((xx - light_x) ** 2 + (yy - light_y) ** 2)
-                        
-                        # 使用高斯分布模拟光源亮度衰减
-                        gradient = max_pix * np.exp(-(distance ** 2) / (2 * sigma ** 2))
-                        
-                        # 将亮度限制在 [min_pix, max_pix] 范围内
+                        distance = np.sqrt((xx - light_x) ** 2 + (yy - light_y) ** 2)                        
+                        gradient = max_pix * np.exp(-(distance ** 2) / (2 * sigma ** 2))                        
                         gradient = np.clip(gradient, min_pix, max_pix)
-                        
-                        # 将亮度值归一化到 [0, 1] 范围
                         gradient_normalized = gradient / max_pix
-                        
-                        # 创建掩码：亮度值超过阈值的位置为1，否则为0
+                    
                         mask = (gradient_normalized > threshold).astype(np.float32)
                         
 
-                        
-                        # 初始化局部噪声
+
                         x_T_sub = torch.randn([1, 1, channels, image_height, image_width], device=device)
                     
-                        # 将掩码转换为张量并调整维度
+
                         mask_tensor = torch.tensor(mask, device=device).unsqueeze(0).unsqueeze(0).unsqueeze(2)
                         
-                        # 将噪声与掩码结合
+                        # masked
                         x_T_sub_masked = x_T_sub * mask_tensor
                         x_T_total_masked = x_T_total[:, :, :, i, :, :] * mask_tensor
 
-                        #将局部噪声和原始噪声加权融合
+                        #fusion
                         x_T_mask = 0.8* x_T_sub_masked + 0.2* x_T_total_masked 
 
-                        # 创建掩码的反掩码（即掩码为0的位置为1，反之亦然）
                         mask_inverted = 1 - mask
                         mask_inverted_tensor = torch.tensor(mask_inverted, device=device).unsqueeze(0).unsqueeze(0).unsqueeze(2)
                         
-                        # 将反掩码应用到总噪声中，保留原始噪声的非掩码部分
+
                         x_T_total_inv_masked = x_T_total[:, :, :, i, :, :] * mask_inverted_tensor
 
-                        # 将局部噪声与总噪声结合
+                        # add
                         x_T_total[:, :, :, i, :, :] = x_T_mask + x_T_total_inv_masked
                         x_T_total = x_T_total.to(dtype=self.unet.dtype)
                     
                     
                     return x_T_total
         
-        latents_inject = inject_light_map_noise(x_T_total=x_T_total,bg_source=BGSource.CIRCULAR,R = light_radius,device=device, total_frames=16)
+        latents_inject = inject_light_map_noise(x_T_total=x_T_total,bg_source=bg_source,R = light_radius,device=device, total_frames=16)
         latents_inject=rearrange(latents_inject, "1 1 c f h w -> 1 c f h w")
         latents=latents_inject
         
@@ -1118,6 +1087,8 @@ class AnimateDiffVideoToVideoPipeline(
             relight_prompt=relight_prompt,
             generator=generator, 
             num_frames=num_frames,
+            bg_source=bg_source,
+            light_radius=light_radius,
             delight_target=normal_target,
             lbd=0
             )

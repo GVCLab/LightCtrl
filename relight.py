@@ -13,7 +13,7 @@ from diffusers import AutoencoderKL, UNet2DConditionModel, DPMSolverMultistepSch
 from diffusers.models.attention_processor import AttnProcessor2_0
 from torch.hub import download_url_to_file
 from PIL import Image
-from models.scheduling_ddim import DDIMScheduler  # add reverse step
+# from models.scheduling_ddim import DDIMScheduler  # add reverse step
 
 from src.ic_light import BGSource
 
@@ -139,8 +139,10 @@ def main(args):
     image_height = config.get("height", 512)
     n_prompt = config.get("n_prompt", "")
     relight_prompt = config.get("relight_prompt", "")
+    light_radius = config.get("light_radius", 75)
     video_path = config.get("video_path", "")
     save_path = config.get("save_path")
+    bg_source = BGSource[config.get("bg_source")]
 
     ##############################  infer  #####################################
     generator = torch.manual_seed(seed)
@@ -156,6 +158,8 @@ def main(args):
             relight_prompt=relight_prompt,
             video=video_list,
             video_path=video_path,
+            light_radius=light_radius,
+            bg_source =bg_source,
             prompt=relight_prompt,
             strength=strength,
             negative_prompt=n_prompt,

@@ -12,7 +12,7 @@ from transformers import CLIPTextModel, CLIPTokenizer
 from diffusers.models.attention_processor import AttnProcessor2_0
 from diffusers import AutoencoderKL, UNet2DConditionModel, DPMSolverMultistepScheduler
 
-from src.ic_light import BGSource
+from src.cogvideo_ic_light import BGSource
 from src.ic_light_pipe import StableDiffusionImg2ImgPipeline
 from src.cogvideo_pipe import CogVideoXVideoToVideoPipeline
 from utils.tools import set_all_seed, read_video
@@ -105,7 +105,8 @@ def main(args):
     vdm_prompt = config.get("vdm_prompt", "")
     relight_prompt = config.get("relight_prompt", "")
     video_path = config.get("video_path", "")
-
+    light_radius = config.get("light_radius", 75)
+    bg_source = BGSource[config.get("bg_source")]
     save_path = config.get("save_path")
     
     ##############################  infer  #####################################
@@ -122,6 +123,8 @@ def main(args):
             relight_prompt=relight_prompt,
             video=video_list,
             video_path=video_path,
+            light_radius=light_radius,
+            bg_source =bg_source,
             prompt=vdm_prompt, 
             strength=strength,
             negative_prompt=negative_prompt,
@@ -142,7 +145,7 @@ if __name__ == "__main__":
     
     parser.add_argument("--sd_model", type=str, default="/workspace/pyz/IC-Light/models/stablediffusionapi-realistic-vision-v51")
     parser.add_argument("--vdm_model", type=str, default="/workspace/pyz/LAV-iclight/models/models--THUDM--CogVideoX-2b")
-    parser.add_argument("--ic_light_model", type=str, default="./models/iclight_sd15_fc.safetensors")
+    parser.add_argument("--ic_light_model", type=str, default="/workspace/pyz/LAV-iclight/models/iclight_sd15_fc.safetensors")
     
     parser.add_argument("--config", type=str, default="configs/cog_relight/bear.yaml", help="the config file for each sample.")
     
