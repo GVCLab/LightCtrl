@@ -1,7 +1,9 @@
 n_prompt: "bad quality, worse quality"
 vdm_prompt: "a cute boy is smiling"
 relight_prompt: "a cute boy is smiling, cozy candlelight"
-video_path: "input_cog/boy_cog.mp4"
+video_path: "input_cog/boy.mp4"
+light_radius: 75
+bg_source: "LEFT_TO_RIGHT"
 save_path: "output_cog"
 
 width: 720
