@@ -1,5 +1,6 @@
-# LightCtrl: Training-free Controllable Video Relighting
+# <img width="40" alt="Screenshot 2025-06-15 at 13 43 27" src="https://github.com/user-attachments/assets/0c1e3053-fce5-4e95-bcd5-1d0261d4daa1"/> <i> LightCtrl: Training-free Controllable Video Relighting</i>
 <h5>Yizuo Peng<sup>1,2</sup> · <a href='https://xuelin-chen.github.io/'>Xuelin Chen</a><sup>3</sup> · Kai Zhang</a><sup>1,*</sup> · <a href='https://vinthony.github.io'>Xiaodong Cun</a><sup>2,*</sup>
+
 
 </br>
 </br>
@@ -7,7 +8,8 @@
 
 </br>
 </br>
-[Arxiv]() | [PDF]()
+
+[Arxiv](https://youtu.be/CQfTe9jAGD8) | [PDF]()
 
 ## Demo Video
 
