@@ -1,9 +1,13 @@
-## LightCtrl: Training-free Controllable Video Relighting
-<h5>Yizuo Peng<sup>1,2</sup>, <a href='https://xuelin-chen.github.io/'>Xuelin Chen</a><sup>3</sup>, Kai Zhang</a><sup>1,*</sup>, <a href='https://vinthony.github.io'>Xiaodong Cun</a><sup>2,*</sup>
+# LightCtrl: Training-free Controllable Video Relighting
+<h5>Yizuo Peng<sup>1,2</sup> · <a href='https://xuelin-chen.github.io/'>Xuelin Chen</a><sup>3</sup> · Kai Zhang</a><sup>1,*</sup> · <a href='https://vinthony.github.io'>Xiaodong Cun</a><sup>2,*</sup>
 
-<sup>1</sup> Tsinghua University &nbsp;&nbsp;&nbsp; <sup>2</sup><a href='https://gvclab.github.io'>GVC Lab, Great Bay University</a>  &nbsp;&nbsp;&nbsp; <sup>3</sup>Adobe Research &nbsp;
+</br>
+</br>
+<sup>1</sup>Tsinghua University &nbsp;&nbsp;&nbsp; <sup>2</sup><a href='https://gvclab.github.io'>GVC Lab, Great Bay University</a>  &nbsp;&nbsp;&nbsp; <sup>3</sup>Adobe Research &nbsp;
 
-**[Arxiv]| [PDF]**
+</br>
+</br>
+[Arxiv]() | [PDF]()
 
 ## Demo Video
 
@@ -94,12 +98,12 @@ CogVideoX-2b: [🤗Huggingface](https://huggingface.co/THUDM/CogVideoX-2b)
 
 ### 3. 💡Relighting
 
-Video relighting with user-defined light setting
+Video relighting with user-defined light setting:
 ```python
 python relight.py --config "configs/animatediff_relight/music_girl.yaml"
 ```
 
-LightCtrl also supports CogVideoX backbone
+LightCtrl also supports the CogVideoX backbone:
 
 ```python
 python cog_relight.py --config "configs/cog_relight/blackman.yaml"
@@ -108,6 +112,7 @@ python cog_relight.py --config "configs/cog_relight/blackman.yaml"
 ## Citation
 
 If you find our work helpful, please leave us a star and cite our paper.
+
 ```
 
 ```
