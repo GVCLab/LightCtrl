@@ -1,15 +1,11 @@
 # <img width="40" alt="Screenshot 2025-06-15 at 13 43 27" src="https://github.com/user-attachments/assets/0c1e3053-fce5-4e95-bcd5-1d0261d4daa1"/> <i> LightCtrl: Training-free Controllable Video Relighting</i>
-<h5>Yizuo Peng<sup>1,2</sup> · <a href='https://xuelin-chen.github.io/'>Xuelin Chen</a><sup>3</sup> · Kai Zhang</a><sup>1,*</sup> · <a href='https://vinthony.github.io'>Xiaodong Cun</a><sup>2,*</sup>
+#### Yizuo Peng<sup>1,2</sup> · <a href='https://xuelin-chen.github.io/'>Xuelin Chen</a><sup>3</sup> · Kai Zhang</a><sup>1,*</sup> · <a href='https://vinthony.github.io'>Xiaodong Cun</a><sup>2,*</sup>
 
-
-</br>
-</br>
-<sup>1</sup>Tsinghua University &nbsp;&nbsp;&nbsp; <sup>2</sup><a href='https://gvclab.github.io'>GVC Lab, Great Bay University</a>  &nbsp;&nbsp;&nbsp; <sup>3</sup>Adobe Research &nbsp;
+<sup>1</sup> Tsinghua University &nbsp;&nbsp;&nbsp; <sup>2</sup><a href='https://gvclab.github.io'>GVC Lab, Great Bay University</a>  &nbsp;&nbsp;&nbsp; <sup>3</sup>Adobe Research &nbsp;
 
 </br>
-</br>
 
-[Arxiv](https://youtu.be/CQfTe9jAGD8) | [PDF]()
+[Openreview](https://openreview.net/forum?id=5ft8vd9rwc) | [PDF](https://openreview.net/pdf?id=5ft8vd9rwc)
 
 ## Demo Video
 
