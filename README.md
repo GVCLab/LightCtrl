@@ -1,5 +1,5 @@
 # <img width="40" alt="Screenshot 2025-06-15 at 13 43 27" src="https://github.com/user-attachments/assets/0c1e3053-fce5-4e95-bcd5-1d0261d4daa1"/> <i> LightCtrl: Training-free Controllable Video Relighting</i>
-#### Yizuo Peng<sup>1,2</sup> · <a href='https://xuelin-chen.github.io/'>Xuelin Chen</a><sup>3</sup> · Kai Zhang</a><sup>1,*</sup> · <a href='https://vinthony.github.io'>Xiaodong Cun</a><sup>2,*</sup>
+#### Yizuo Peng<sup>1,2</sup> · <a href='https://xuelin-chen.github.io/'>Xuelin Chen</a><sup>3</sup> · Kai Zhang</a><sup>1,* </sup> · <a href='https://vinthony.github.io'>Xiaodong Cun</a><sup>2, *</sup>
 
 <sup>1</sup> Tsinghua University &nbsp;&nbsp;&nbsp; <sup>2</sup><a href='https://gvclab.github.io'>GVC Lab, Great Bay University</a>  &nbsp;&nbsp;&nbsp; <sup>3</sup>Adobe Research &nbsp;
 
@@ -112,6 +112,13 @@ python cog_relight.py --config "configs/cog_relight/blackman.yaml"
 If you find our work helpful, please leave us a star and cite our paper.
 
 ```
+@inproceedings{ peng2026lightctrl,
+title={LightCtrl: Training-free Controllable Video Relighting},
+author={Yizuo Peng and Xuelin Chen and Kai Zhang and Xiaodong Cun},
+booktitle={The Fourteenth International Conference on Learning Representations},
+year={2026},
+url={https://openreview.net/forum?id=5ft8vd9rwc}
+}
 
 ```
 
