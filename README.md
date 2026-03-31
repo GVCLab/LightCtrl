@@ -5,7 +5,7 @@
 
 </br>
 
-[Openreview](https://openreview.net/forum?id=5ft8vd9rwc) | [PDF](https://openreview.net/pdf?id=5ft8vd9rwc)
+[Arxiv](https://arxiv.org/abs/2603.27083) | [Openreview](https://openreview.net/forum?id=5ft8vd9rwc) | [PDF](https://openreview.net/pdf?id=5ft8vd9rwc)
 
 ## Demo Video
 
